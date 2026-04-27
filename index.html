@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
+    <style>body,html{margin:0;padding:0;height:100%;display:flex;justify-content:center;align-items:center;flex-direction:column;background:#f5f5f5}canvas{border:1px solid#333;width:80%;height:auto;margin-top:20px}input,button{margin-top:10px;padding:5px}</style>
+</head>
+<body>
+    <div id="l"><input id="u" placeholder="Username"/><button id="s">Start</button></div>
+    <div id="g" style="display:none;">
+        <div id="r"></div><div id="w"></div><div id="t">Time: <span id="tl">30</span></div><div id="sc">Score: <span id="scv">0</span></div>
+        <input type="color" id="cp" value="#000"/><input type="range" id="bs" min="1" max="10" value="5"/>
+        <button id="c">Clear</button><input id="gi" placeholder="Guess"/><button id="gs">Submit</button>
+    </div>
+    <script>
+        let c='#000',b=5,s=0,w='',tl=30,r=1,mr=3,lx,ly,wd=[],url='https://random-word-api.herokuapp.com/word?number=10';
+        function setup(){createCanvas(windowWidth*.8,windowHeight*.6);background(255);}
+        function draw(){$('#tl').text(tl);$('#scv').text(s);if(tl>0)requestAnimationFrame(draw);}
+        function mousePressed(){lx=mouseX;ly=mouseY;}
+        function mouseDragged(){stroke(c);strokeWeight(b);line(lx,ly,mouseX,mouseY);lx=mouseX;ly=mouseY;}
+        $(document).ready(function(){
+            $('#s').click(()=>{let u=$('#u').val().trim();if(u){$('#l').hide();$('#g').show();$.get(url,d=>{wd=d;startGame();});}else alert('Enter username');});
+            $('#c').click(()=>{clear();background(255);});
+            $('#gs').click(()=>{let g=$('#gi').val().toLowerCase().trim();if(g===w){s+=10;alert('Correct!');nextRound();}else alert('Incorrect!');});
+            $('#cp').on('input',e=>{c=e.target.value;});
+            $('#bs').on('input',e=>{b=e.target.value;});
+        });
+        function startGame(){r=1;s=0;nextRound();}
+        function nextRound(){if(r>mr){endGame();return;}w=_.sample(wd);$('#r').text(`Round ${r} of ${mr}`);$('#w').text(`Draw: ${w}`);tl=30;startTimer();}
+        function startTimer(){setInterval(()=>{if(tl>0)tl--;else nextRound();},1000);}
+        function endGame(){alert(`Game Over! Final Score: ${s}`);$('#l').show();$('#g').hide();}
+    </script>
+</body>
+</html>
