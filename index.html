@@ -3,277 +3,207 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎨 **Your Epic Drawing Game** 🖌️ (Made by YOU with a Little Help from ChatGPT!)</title>
+    <title>Epic Drawing Game</title>
     <style>
-        body {
+        body, html {
             margin: 0;
             padding: 0;
-            font-family: 'Comic Sans MS', cursive, sans-serif;
-            background: radial-gradient(circle, rgba(238,174,202,1) 0%, rgba(148,187,233,1) 100%);
+            height: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            color: #3c3c3c;
+            font-family: sans-serif;
+            background: #f0f0f0;
         }
-
         .container {
             text-align: center;
+            max-width: 800px;
             width: 100%;
-            max-width: 900px;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 16px;
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
-            background: linear-gradient(135deg, #FF6F61, #FFB6B9);
-            color: #fff;
         }
-
-        h2 {
-            color: #fff;
-            font-size: 3rem;
-            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
-            margin-bottom: 20px;
-            text-transform: uppercase;
-            font-family: 'Georgia', serif;
-        }
-
-        button, input[type="color"], input[type="range"] {
-            margin: 15px;
-            padding: 12px 20px;
-            border-radius: 12px;
-            font-size: 1.3em;
-            cursor: pointer;
-            border: none;
-            transition: 0.3s;
-            background-color: #f2a154;
-            color: white;
-        }
-
-        button:disabled {
-            background-color: #dcdcdc;
-        }
-
-        button:hover, input[type="color"]:hover, input[type="range"]:hover {
-            background-color: #ff6347;
-            color: white;
-        }
-
-        .player-list {
-            margin-top: 20px;
-            text-align: left;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-        }
-
-        .player-list h3 {
-            font-size: 1.5em;
-            margin-bottom: 10px;
-            color: #f0f0f0;
-            font-family: 'Comic Sans MS', cursive, sans-serif;
-        }
-
-        .player-list ul {
-            list-style: none;
-            padding: 0;
-            color: #fff;
-            font-size: 1.1em;
-        }
-
-        .player-list li {
-            margin: 5px 0;
-        }
-
-        .game-controls {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
         canvas {
-            border: 2px solid #444;
-            margin-top: 20px;
             width: 80%;
-            max-width: 600px;
             height: 400px;
             background: #fff;
-        }
-        
-        .score {
-            font-size: 2em;
-            color: #fff;
+            border: 1px solid #ddd;
             margin-top: 20px;
-            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
         }
-
-        .fun-message {
-            font-size: 1.4em;
-            margin-top: 15px;
-            color: #ffdd57;
-            font-style: italic;
-            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+        button, input[type="color"], input[type="range"] {
+            margin-top: 10px;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
         }
-
-        .easter-egg {
-            display: none;
-            font-size: 1.8em;
-            color: #ff69b4;
-            font-weight: bold;
-            margin-top: 20px;
-            text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.3);
+        button:disabled {
+            background-color: #ccc;
         }
-
-        .encouragement {
-            color: #f0e68c;
-            font-size: 1.2em;
-            margin-top: 15px;
-            font-style: italic;
+        .player-list {
+            margin-top: 10px;
+            list-style-type: none;
+            padding: 0;
         }
-
-        .credit {
-            font-size: 1.2em;
-            margin-top: 25px;
-            color: #ff6347;
-            font-weight: bold;
+        .player-list li {
+            margin: 5px 0;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>🎨 **Your Epic Drawing Game** 🖌️ (Made by YOU with a Little Help from ChatGPT!)</h2>
+        <div id="l">
+            <h2>Loading your ID...</h2>
+            <button id="s" disabled>Start</button>
+        </div>
 
-        <button id="startBtn" disabled>Let’s Start This Party! 💥</button>
-
-        <div id="game" style="display: none;">
-            <div class="score">
-                <span>Score: <span id="score">0</span></span>
-            </div>
-
-            <div class="game-controls">
-                <canvas id="drawCanvas"></canvas>
-                <input type="color" id="colorPicker" value="#000000">
-                <input type="range" id="brushSize" min="1" max="10" value="5">
-                <button id="clearCanvas">Clear This Masterpiece 🧹</button>
-                <input type="text" id="guessInput" placeholder="Guess the masterpiece...">
-                <button id="submitGuess">Submit Your Guess!</button>
-            </div>
-
-            <div class="player-list">
-                <h3>Current Players:</h3>
-                <ul id="playerList"></ul>
-            </div>
-
-            <div class="fun-message">
-                ⚡ **Get ready to guess and draw! Let's create some art magic!** 🎉
-            </div>
-
-            <div class="encouragement">
-                💡 **Keep going! You’re doing awesome!** ✨
-            </div>
-
-            <div class="easter-egg" id="easterEgg">
-                🎉 **You found the hidden egg!** 🥚 Nice job, detective! 👀
-                <br>💥 **Congrats! You’ve unlocked something special!** 💥
-            </div>
-
-            <!-- Credit to ChatGPT -->
-            <div class="credit">
-                🤖 **This game was brought to you by ChatGPT!** 🚀
-                <br>💬 **Created with a touch of AI magic!** ✨
-                <br>💡 **Big thanks to ChatGPT for helping make this game epic!** 🎨
-            </div>
+        <div id="g" style="display:none">
+            <canvas id="c"></canvas>
+            <input type="color" id="cp" value="#000">
+            <input type="range" id="bs" min="1" max="10" value="5">
+            <button id="cbtn">Clear</button>
+            <input type="text" id="gi" placeholder="Guess what is drawn">
+            <button id="gs">Submit Guess</button>
+            <ul id="players" class="player-list"></ul>
+            <h3 id="time-left">Time: 30</h3>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.4.6/dist/peerjs.min.js"></script>
+    <script src="https://cdn.peerjs.com/peerjs.min.js"></script>
     <script>
-        let color = '#000000', brushSize = 5, word = '', timeLeft = 30, score = 0;
-        const canvas = document.getElementById('drawCanvas'), ctx = canvas.getContext('2d');
-        const startBtn = document.getElementById('startBtn'), gameDiv = document.getElementById('game'), guessInput = document.getElementById('guessInput'), submitGuess = document.getElementById('submitGuess');
-        const playerList = document.getElementById('playerList'), scoreDisplay = document.getElementById('score');
-        const easterEggDiv = document.getElementById('easterEgg');
+        let c = '#000', b = 5, s = 0, w = '', tl = 30, r = 1, mr = 3, lx, ly, wd = [];
+        const canvas = document.getElementById('c'), ctx = canvas.getContext('2d');
+        const startButton = document.getElementById('s'), gameContainer = document.getElementById('g'), startContainer = document.getElementById('l');
+        const guessInput = document.getElementById('gi'), submitGuessButton = document.getElementById('gs');
+        const playersList = document.getElementById('players'), timeLeft = document.getElementById('time-left');
+        canvas.width = window.innerWidth * 0.8, canvas.height = 400;
 
-        const peer = new Peer(undefined, { host: 'localhost', port: 9000, path: '/peerjs' });
-
-        peer.on('open', id => {
-            startBtn.innerText = `Join as Player ${id}`;
-            startBtn.disabled = false;
-            startBtn.onclick = () => startGame(id);
+        // Setup PeerJS - No server needed, it uses PeerJS Cloud Server
+        const peer = new Peer(undefined, {
+            host: 'peerjs.com', // Using PeerJS's cloud server
+            port: 9000, // Default port for PeerJS
+            path: '/peerjs',
+            secure: true // Use secure connection (HTTPS)
         });
 
-        function startGame(playerId) {
-            gameDiv.style.display = 'block';
-            startBtn.disabled = true;
-            addPlayer(playerId);
-            simulateBotPlayers();
-            fetchWord();
-        }
+        let peerId = null;
 
-        function addPlayer(id) {
-            const li = document.createElement('li');
-            li.textContent = `Player ${id}`;
-            playerList.appendChild(li);
-        }
+        // When the peer is connected, display the player's ID and allow the game to start
+        peer.on('open', id => {
+            peerId = id;
+            startButton.innerText = `Start as ${id}`;
+            startButton.disabled = false;
+            startButton.onclick = () => startGame(id);
+        });
 
-        function simulateBotPlayers() {
-            for (let i = 0; i < 3; i++) {
-                const botId = `Bot-${Math.floor(Math.random() * 1000)}`;
-                addPlayer(botId);
-            }
-        }
+        // Setup peer connection and player list
+        let peers = {}; // Keeps track of peer connections
 
-        function fetchWord() {
-            fetch('https://random-word-api.herokuapp.com/word?number=1')
+        function startGame(username) {
+            startContainer.style.display = 'none';
+            gameContainer.style.display = 'block';
+
+            // Request random words for the game
+            fetch('https://random-word-api.herokuapp.com/word?number=10')
                 .then(res => res.json())
-                .then(data => {
-                    word = data[0];
-                    startTimer();
+                .then(data => { wd = data; nextRound(); });
+
+            // Connect to any existing players automatically
+            peer.listAllPeers(peersList => {
+                peersList.forEach(id => {
+                    if (id !== peerId) {
+                        connectToPeer(id);
+                    }
                 });
+            });
         }
 
+        // Start the next round
+        function nextRound() {
+            if (r > mr) return endGame();
+            w = wd[Math.floor(Math.random() * wd.length)];
+            tl = 30;
+            setTimeout(startTimer, 1000);
+            updatePlayerList();
+        }
+
+        // Start the countdown timer
         function startTimer() {
             setInterval(() => {
-                if (timeLeft <= 0) {
-                    alert("Time's up! 🤖 Round over!");
-                    nextRound();
-                }
-                document.getElementById('score').innerText = score;
+                if (tl <= 0) nextRound();
+                timeLeft.innerText = `Time: ${--tl}`;
             }, 1000);
         }
 
-        submitGuess.onclick = () => {
-            if (guessInput.value.trim().toLowerCase() === word) {
-                score += 10;
+        // End the game and show the final score
+        function endGame() {
+            alert(`Game Over! Final Score: ${s}`);
+            gameContainer.style.display = 'none';
+            startContainer.style.display = 'block';
+        }
+
+        // Handle the guess submission
+        submitGuessButton.onclick = () => {
+            if (guessInput.value.trim().toLowerCase() === w) {
+                s += 10;
                 nextRound();
-            } else if (guessInput.value.trim().toLowerCase() === "reveal the egg") {
-                easterEggDiv.style.display = 'block';
-                alert("🎉 Surprise! You found the hidden egg!");
             } else {
-                alert('Oops, try again! 🤔');
+                alert('Incorrect!');
             }
         };
 
-        document.getElementById('clearCanvas').onclick = () => ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // Change drawing color
+        document.getElementById('cp').oninput = e => c = e.target.value;
 
-        let isDrawing = false, lastX = 0, lastY = 0;
-        canvas.onmousedown = e => { isDrawing = true; lastX = e.offsetX; lastY = e.offsetY; };
+        // Change brush size
+        document.getElementById('bs').oninput = e => b = e.target.value;
+
+        // Clear the canvas
+        document.getElementById('cbtn').onclick = () => ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Handle drawing on the canvas
+        canvas.onmousedown = e => { lx = e.offsetX; ly = e.offsetY; };
         canvas.onmousemove = e => {
-            if (!isDrawing) return;
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(e.offsetX, e.offsetY);
-            ctx.strokeStyle = color;
-            ctx.lineWidth = brushSize;
-            ctx.stroke();
-            lastX = e.offsetX;
-            lastY = e.offsetY;
+            if (lx !== undefined && ly !== undefined) {
+                ctx.beginPath();
+                ctx.moveTo(lx, ly);
+                ctx.lineTo(e.offsetX, e.offsetY);
+                ctx.strokeStyle = c;
+                ctx.lineWidth = b;
+                ctx.stroke();
+                lx = e.offsetX;
+                ly = e.offsetY;
+            }
         };
-        canvas.onmouseup = () => isDrawing = false;
 
-        document.getElementById('colorPicker').oninput = e => color = e.target.value;
-        document.getElementById('brushSize').oninput = e => brushSize = e.target.value;
+        // Function to connect to another peer
+        function connectToPeer(id) {
+            const conn = peer.connect(id);
+            conn.on('open', () => {
+                console.log(`Connected to peer ${id}`);
+                conn.send('hello');
+            });
+        }
+
+        // Update player list on the screen
+        function updatePlayerList() {
+            peersList.forEach(id => {
+                let playerItem = document.createElement('li');
+                playerItem.innerText = `Player: ${id}`;
+                playersList.appendChild(playerItem);
+            });
+        }
+
+        // Fetch IP and start button logic
+        fetchIP();
+
+        async function fetchIP() {
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
+                startButton.innerText = `Start as ${data.ip}`;
+                startButton.disabled = false;
+                startButton.onclick = () => startGame(data.ip);
+            } catch (err) {
+                alert('Error fetching IP');
+            }
+        }
     </script>
 </body>
 </html>
