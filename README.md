@@ -1,58 +1,67 @@
-# **Epic Drawing Game** 🖌️  
-**Developed by [Your Name], with a little help from ChatGPT** 🤖✨
+# Epic Drawing Game 🖌️
 
-Welcome to the **Epic Drawing Game**—a multiplayer experience where players take turns drawing and guessing! Whether you’re a casual player or a seasoned artist, this game offers a fun and interactive way to test your creative and guessing skills. 
+**Developed by Jake Fieldsenior, with a little help from ChatGPT** 🤖✨
 
-## **Features**
+Welcome to the Epic Drawing Game—a multiplayer experience where players take turns drawing and guessing! Whether you’re a casual player or a seasoned artist, this game offers a fun and interactive experience.
+
+---
+
+## Table of Contents
+1. [Features](#features)
+2. [How to Play](#how-to-play)
+3. [Technologies Used](#technologies-used)
+4. [Running the Game Locally](#how-to-run-locally)
+5. [Acknowledgements](#acknowledgements)
+6. [Contributing](#contributing)
+
+---
+
+## Features
 - **Multiplayer Support**: Play with friends or other online players in the same game lobby.
 - **Drawing & Guessing**: Draw a word and try to guess what others are drawing. Correct guesses earn points.
 - **Customization**: Choose your brush size and color for your drawings.
 - **Easter Egg**: Hidden within the game is a secret phrase. If you find it, a special surprise will be revealed.
-- **Score System**: Players earn points by guessing drawings correctly. Keep track of your score as the game progresses.
+- **Points System**: Earn points by guessing correctly, and compete to top the leaderboard.
 
-## **How to Play**
-1. **Join the Game**: Open the game and click **"Let’s Start This Party!"** to join the lobby. You’ll be assigned a unique player ID.
-2. **Drawing Mode**: If it’s your turn, draw the word displayed on the screen. Use the brush size and color controls to customize your masterpiece.
-3. **Guessing Mode**: When it's not your turn to draw, try to guess what the other players are creating. The faster and more accurately you guess, the more points you earn.
-4. **Points**: Correct guesses result in points. The player with the most points at the end of the game wins!
-5. **Easter Egg**: There’s a hidden phrase within the game. Type **"reveal the egg"** in the guess box to uncover a special Easter egg!
+---
 
-## **Technologies Used**
-This game is built with **HTML**, **CSS**, and **JavaScript**, along with the **PeerJS** library to handle peer-to-peer connections, making it multiplayer-ready without the need for a server.
+## How to Play
+1. **Joining**: Open the game and click **"Let’s Start This Party!"** to join the lobby.
+2. **Drawing Mode**: On your turn, draw the word displayed on the screen using the brush and color tools.
+3. **Guessing Mode**: Guess the drawings of other players as quickly and accurately as you can for points.
+4. **Winning**: The player with the highest score at the end of the game wins!
+5. **Discover Easter Egg**: Type `"reveal the egg"` in the guessing box for a surprise.
 
-- **Canvas**: Used to provide an interactive drawing area.
-- **PeerJS**: Enables direct peer-to-peer communication for multiplayer support.
-- **Random Word API**: Supplies random words for players to guess based on drawings.
+---
 
-## **How to Run Locally**
+## Technologies Used
+This game is powered by:
+- **HTML**, **CSS**, **JavaScript**: Core technologies for building the application interface.
+- **PeerJS Library**: Facilitates peer-to-peer multiplayer connections.
+- **Random Word API**: Provides random words for drawing and guessing.
+
+---
+
+## How to Run Locally
 To run the game on your local machine:
-1. Clone the repository:  
-   `git clone https://github.com/yourusername/epic-drawing-game.git`
+1. Clone the repository:
+    ```
+    git clone https://github.com/jakefieldsenior/animated-octo-meme.git
+    ```
 2. Open the `index.html` file in your web browser.
-3. **No server needed**: The game runs entirely in the browser using peer-to-peer connections, so there's no need for a backend server.
-
-## **Acknowledgements**
-This project wouldn’t have been possible without the assistance of **ChatGPT**, which helped bring the game concept to life, from the game logic to fun interactive features.
-
-- **"A special thanks to ChatGPT for its invaluable assistance in making this game both functional and fun!"**
-
-## **Contributing**
-If you’d like to contribute to the project, feel free to fork the repository and submit pull requests. You can suggest new features, fix bugs, or improve the user experience. Contributions are always welcome!
+3. **Note**: The game is entirely browser-based and requires no server setup.
 
 ---
 
-**Enjoy the game and have fun!**  
-"Creativity has no limits, and neither does this game!" — [Your Name] 🎨
+## Acknowledgements
+Special thanks to:
+- **ChatGPT** for code and feature assistance.
+- **PeerJS** creators for enabling serverless multiplayer functionality.
 
 ---
 
-### **Changes from the Previous Version:**
-- **Professional Tone**: The language is more polished and professional, while still being friendly and approachable.
-- **Clear Instructions**: I've kept the instructions concise and clear so that new players can easily understand how to get started.
-- **Technologies Section**: The tech stack is outlined in a more formal, structured manner.
-- **Acknowledgements**: This part now clearly credits ChatGPT in a more professional way.
-- **Contributions Section**: I added an invitation for contributors to join the project and help improve it.
-
----
-
-This version should strike a **good balance** between being **professional** and still showcasing your personality and the fun nature of the game. You can copy this into your `README.md` file for a more polished presentation. Let me know if you’d like further adjustments!
+## Contributing
+Contributions are welcome! To support the project:
+1. Fork the repository.
+2. Create a new branch for your changes.
+3. Submit a pull request with a clear description.
