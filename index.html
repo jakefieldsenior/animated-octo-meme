@@ -13,12 +13,16 @@
             justify-content: center;
             align-items: center;
             font-family: sans-serif;
-            background: #f0f0f0;
+            background: #f5f5f5;
         }
         .container {
             text-align: center;
-            max-width: 600px;
+            max-width: 800px;
             width: 100%;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
         }
         canvas {
             width: 80%;
@@ -27,7 +31,7 @@
             border: 1px solid #ddd;
             margin-top: 20px;
         }
-        button, input[type="color"], input[type="range"] {
+        button, input {
             margin-top: 10px;
             padding: 8px;
             border-radius: 8px;
@@ -36,98 +40,154 @@
         button:disabled {
             background-color: #ccc;
         }
+        .player-list {
+            margin-top: 20px;
+            text-align: left;
+            padding: 10px;
+            background: #f7f7f7;
+            border-radius: 8px;
+            width: 100%;
+        }
+        .player-list ul {
+            list-style: none;
+            padding: 0;
+        }
+        .player-list li {
+            padding: 5px;
+            font-size: 14px;
+            border-bottom: 1px solid #ddd;
+        }
+        .scoreboard {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .game-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .game-controls input,
+        .game-controls button {
+            width: 80%;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div id="l">
-            <h2>Loading your IP...</h2>
-            <button id="s" disabled>Start</button>
-        </div>
+        <h2>Drawing Game</h2>
+        <button id="startBtn" disabled>Start</button>
+        
+        <div id="game" style="display:none">
+            <div class="scoreboard">
+                <span>Score: <span id="score">0</span></span>
+            </div>
 
-        <div id="g" style="display:none">
-            <canvas id="c"></canvas>
-            <input type="color" id="cp" value="#000">
-            <input type="range" id="bs" min="1" max="10" value="5">
-            <button id="cbtn">Clear</button>
-            <input type="text" id="gi" placeholder="Guess what is drawn">
-            <button id="gs">Submit Guess</button>
+            <div class="game-controls">
+                <canvas id="drawCanvas"></canvas>
+                <input type="color" id="colorPicker" value="#000">
+                <input type="range" id="brushSize" min="1" max="10" value="5">
+                <button id="clearCanvas">Clear</button>
+                <input type="text" id="guessInput" placeholder="Guess what is drawn">
+                <button id="submitGuess">Submit Guess</button>
+            </div>
+
+            <div class="player-list">
+                <h3>Players</h3>
+                <ul id="playerList">
+                    <!-- Player names will appear here -->
+                </ul>
+            </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/peerjs@1.4.6/dist/peerjs.min.js"></script>
     <script>
-        let c='#000',b=5,s=0,w='',tl=30,r=1,mr=3,lx,ly,wd=[];
-        const canvas=document.getElementById('c'),ctx=canvas.getContext('2d'),startButton=document.getElementById('s'),gameContainer=document.getElementById('g'),startContainer=document.getElementById('l'),guessInput=document.getElementById('gi'),submitGuessButton=document.getElementById('gs');
-        canvas.width=window.innerWidth*.8,canvas.height=400;
+        let color='#000', brushSize=5, word='', timeLeft=30, score=0, drawingPeer, roomPeers=[], canvas=document.getElementById('drawCanvas'), ctx=canvas.getContext('2d');
+        const startBtn = document.getElementById('startBtn'), gameDiv = document.getElementById('game'), guessInput = document.getElementById('guessInput'), submitGuess = document.getElementById('submitGuess');
+        const playerList = document.getElementById('playerList'), scoreDisplay = document.getElementById('score');
 
-        async function fetchIP(){
-            try {
-                const res = await fetch('https://api.ipify.org?format=json');
-                const data = await res.json();
-                startButton.innerText=`Start as ${data.ip}`;
-                startButton.disabled = false;
-                startButton.onclick = () => startGame(data.ip);
-            } catch (err) {
-                alert('Error fetching IP');
-            }
+        canvas.width = window.innerWidth * 0.8;
+        canvas.height = 400;
+
+        const peer = new Peer(undefined, {host: 'your-signaling-server.com', port: 9000, path: '/peerjs'});
+
+        peer.on('open', id => {
+            startBtn.innerText = `Start as ${id}`; 
+            startBtn.disabled = false;
+            startBtn.onclick = () => startGame();
+        });
+
+        function startGame() {
+            gameDiv.style.display = 'block';
+            startBtn.disabled = true;
+            connectToRoom();
+            fetchWord();
+            addPlayer(peer.id);  // Add current player to the list
         }
 
-        function startGame(username) {
-            startContainer.style.display = 'none';
-            gameContainer.style.display = 'block';
-            fetch('https://random-word-api.herokuapp.com/word?number=10')
+        function addPlayer(id) {
+            const li = document.createElement('li');
+            li.textContent = `Player ${id}`;
+            playerList.appendChild(li);
+        }
+
+        function connectToRoom() {
+            peer.on('call', call => {
+                call.answer();
+                call.on('stream', stream => {
+                    // Handle incoming media (if any)
+                });
+            });
+        }
+
+        function fetchWord() {
+            fetch('https://random-word-api.herokuapp.com/word?number=1')
                 .then(res => res.json())
-                .then(data => { wd = data; nextRound(); });
+                .then(data => { word = data[0]; nextRound(); });
         }
 
         function nextRound() {
-            if (r > mr) return endGame();
-            w = wd[Math.floor(Math.random() * wd.length)];
-            tl = 30;
-            setTimeout(startTimer, 1000);
-        }
-
-        function startTimer() {
+            if (timeLeft <= 0) return endGame();
+            timeLeft = 30; guessInput.value = ''; 
             setInterval(() => {
-                if (tl <= 0) nextRound();
-                document.getElementById('t').innerText = `Time: ${--tl}`;
+                if (timeLeft <= 0) nextRound();
+                document.getElementById('t').innerText = `Time: ${--timeLeft}`;
             }, 1000);
         }
 
         function endGame() {
-            alert(`Game Over! Final Score: ${s}`);
-            gameContainer.style.display = 'none';
-            startContainer.style.display = 'block';
+            alert(`Game Over! Score: ${score}`);
+            gameDiv.style.display = 'none';
+            startBtn.disabled = false;
         }
 
-        submitGuessButton.onclick = () => {
-            if (guessInput.value.trim().toLowerCase() === w) {
-                s += 10;
+        submitGuess.onclick = () => {
+            if (guessInput.value.trim().toLowerCase() === word) {
+                score += 10; 
+                scoreDisplay.textContent = score;
                 nextRound();
-            } else {
-                alert('Incorrect!');
-            }
-        }
+            } else alert('Incorrect!');
+        };
 
-        document.getElementById('cp').oninput = e => c = e.target.value;
-        document.getElementById('bs').oninput = e => b = e.target.value;
-        document.getElementById('cbtn').onclick = () => ctx.clearRect(0, 0, canvas.width, canvas.height);
+        document.getElementById('colorPicker').oninput = e => color = e.target.value;
+        document.getElementById('brushSize').oninput = e => brushSize = e.target.value;
+        document.getElementById('clearCanvas').onclick = () => ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        canvas.onmousedown = e => { lx = e.offsetX; ly = e.offsetY; };
+        let isDrawing = false, lastX = 0, lastY = 0;
+        canvas.onmousedown = e => { isDrawing = true; lastX = e.offsetX; lastY = e.offsetY; };
         canvas.onmousemove = e => {
-            if (lx !== undefined && ly !== undefined) {
-                ctx.beginPath();
-                ctx.moveTo(lx, ly);
-                ctx.lineTo(e.offsetX, e.offsetY);
-                ctx.strokeStyle = c;
-                ctx.lineWidth = b;
-                ctx.stroke();
-                lx = e.offsetX;
-                ly = e.offsetY;
-            }
-        }
-
-        fetchIP();
+            if (!isDrawing) return;
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.strokeStyle = color;
+            ctx.lineWidth = brushSize;
+            ctx.stroke();
+            lastX = e.offsetX;
+            lastY = e.offsetY;
+        };
+        canvas.onmouseup = () => isDrawing = false;
     </script>
 </body>
 </html>
