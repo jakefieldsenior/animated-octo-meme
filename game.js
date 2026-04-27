@@ -10,6 +10,11 @@ const guessInput = document.getElementById('guessInput');
 const submitGuess = document.getElementById('submitGuess');
 const playerList = document.getElementById('playerList');
 const timer = document.getElementById('timer');
+const scoreDisplay = document.getElementById('score');
+const roundInfo = document.getElementById('roundInfo');
+const highScoreMenu = document.getElementById('highScoreMenu');
+const highScoreGame = document.getElementById('highScoreGame');
+const difficultySelect = document.getElementById('difficulty');
 
 // Drawing state
 let drawing = false, prevX = 0, prevY = 0;
@@ -17,9 +22,10 @@ let color = colorPicker.value;
 let size = parseInt(brushSize.value, 10);
 
 // Game state
-let word = "", words = [], score = 0, timeLeft = 30, timerInterval;
+let word = "", words = [], score = 0, highScore = localStorage.getItem('highScore') || 0, timeLeft = 30, timerInterval;
 let peer = null, peerId = null, connections = [];
 let currentPlayers = [];
+let difficulty = 'normal', roundsCompleted = 0, totalRounds = 10;
 
 // ---- PeerJS Setup ----
 peer = new Peer(undefined, {
@@ -30,20 +36,35 @@ peer = new Peer(undefined, {
 });
 peer.on('open', id => {
     peerId = id;
-    startBtn.textContent = `Start as ${id}`;
+    startBtn.textContent = `Start Game`;
     startBtn.disabled = false;
 });
+
+// Initialize high scores
+if (highScoreMenu) highScoreMenu.textContent = highScore;
+if (highScoreGame) highScoreGame.textContent = highScore;
 
 startBtn.onclick = startGame;
 
 function startGame() {
+    difficulty = difficultySelect ? difficultySelect.value : 'normal';
+    totalRounds = difficulty === 'easy' ? 5 : difficulty === 'hard' ? 15 : 10;
+    roundsCompleted = 0;
+    score = 0;
+    scoreDisplay.textContent = score;
     loadingDiv.classList.add('hidden');
     gameDiv.classList.remove('hidden');
-    // Fetch random words
-    fetch('https://random-word-api.herokuapp.com/word?number=10')
+    
+    const wordCount = difficulty === 'easy' ? 5 : difficulty === 'hard' ? 15 : 10;
+    fetch(`https://random-word-api.herokuapp.com/word?number=${wordCount}`)
     .then(res => res.json())
     .then(data => {
         words = data;
+        nextRound();
+    })
+    .catch(err => {
+        console.error('Error fetching words:', err);
+        words = ['apple', 'cat', 'house', 'sun', 'tree', 'car', 'dog', 'fish', 'book', 'star', 'chair', 'flower', 'mountain', 'ocean', 'guitar'];
         nextRound();
     });
     // Try to connect to other peers
@@ -92,28 +113,42 @@ clearButton.onclick = () => ctx.clearRect(0, 0, canvas.width, canvas.height);
 
 // ---- Timer, Rounds, & Score ----
 function nextRound() {
-    if (words.length === 0) return endGame();
+    roundsCompleted++;
+    if (words.length === 0 || roundsCompleted > totalRounds) return endGame();
     word = words.pop();
     guessInput.value = "";
-    timeLeft = 30;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Set time based on difficulty
+    timeLeft = difficulty === 'easy' ? 45 : difficulty === 'hard' ? 20 : 30;
     timer.textContent = `Time: ${timeLeft}`;
+    roundInfo.textContent = `Draw: "${word}" (Round ${roundsCompleted}/${totalRounds})`;
+    
     if (timerInterval) clearInterval(timerInterval);
     timerInterval = setInterval(() => {
         timeLeft--;
         timer.textContent = `Time: ${timeLeft}`;
-        if (timeLeft <= 0) nextRound();
+        if (timeLeft <= 0) {
+            alert('Time\'s up!');
+            nextRound();
+        }
     }, 1000);
 }
 
 // ---- Guess Handling ----
 submitGuess.onclick = () => {
-    if (guessInput.value.trim().toLowerCase() === word) {
-        score += 10;
+    const guess = guessInput.value.trim().toLowerCase();
+    if (guess === word.toLowerCase()) {
+        const points = difficulty === 'easy' ? 5 : difficulty === 'hard' ? 20 : 10;
+        score += points;
+        scoreDisplay.textContent = score;
+        clearInterval(timerInterval);
+        alert(`Correct! +${points} points`);
         nextRound();
-    } else if (guessInput.value.trim().toLowerCase() === "reveal the egg") {
-        alert("🥚 You found the Easter egg! 🥚");
-    } else {
-        alert('Incorrect!');
+    } else if (guess === "reveal the egg") {
+        alert("🥚 You found the Easter egg! Try to guess normally for real points! 🥚");
+    } else if (guess.length > 0) {
+        alert('Incorrect! Try again.');
     }
 }
 
@@ -126,10 +161,25 @@ setInterval(updatePlayers, 2000);
 // ---- End Game ----
 function endGame() {
     clearInterval(timerInterval);
-    alert(`Game Over! Final Score: ${score}`);
+    let message = `Game Over! Final Score: ${score}`;
+    
+    if (score > highScore) {
+        highScore = score;
+        localStorage.setItem('highScore', highScore);
+        if (highScoreMenu) highScoreMenu.textContent = highScore;
+        if (highScoreGame) highScoreGame.textContent = highScore;
+        message += '\n🏆 NEW HIGH SCORE! 🏆';
+    }
+    
+    alert(message);
     gameDiv.classList.add('hidden');
     loadingDiv.classList.remove('hidden');
     guessInput.value = "";
+    score = 0;
+    scoreDisplay.textContent = score;
+    words = [];
+    roundInfo.textContent = "Game Over!";
+    startBtn.disabled = false;
 }
 
 window.onload = () => {

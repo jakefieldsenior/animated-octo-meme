@@ -9,19 +9,42 @@
 <body>
     <div class="container">
         <div id="loading" class="menu">
+            <h1>🎨 Epic Drawing Game 🎨</h1>
             <h2>Loading your ID...</h2>
-            <button id="start" disabled>Start</button>
+            <div class="difficulty-selector">
+                <label for="difficulty">Difficulty:</label>
+                <select id="difficulty">
+                    <option value="easy">Easy (5 rounds, 45s each)</option>
+                    <option value="normal" selected>Normal (10 rounds, 30s each)</option>
+                    <option value="hard">Hard (15 rounds, 20s each)</option>
+                </select>
+            </div>
+            <button id="start" disabled>Start Game</button>
+            <p class="high-score">High Score: <span id="highScoreMenu">0</span></p>
         </div>
 
         <div id="game" class="hidden">
+            <div class="game-header">
+                <div class="score-section">
+                    <h2>Score: <span id="score">0</span></h2>
+                    <p class="high-score-inline">🏆 High Score: <span id="highScoreGame">0</span></p>
+                </div>
+                <h3 id="timer">Time: 30</h3>
+            </div>
+            <h3 id="roundInfo">Get ready to draw!</h3>
             <canvas id="canvas"></canvas>
-            <input type="color" id="colorPicker" value="#000">
-            <input type="range" id="brushSize" min="1" max="10" value="5">
-            <button id="clearButton">Clear</button>
-            <input type="text" id="guessInput" placeholder="Guess the drawing">
-            <button id="submitGuess">Submit Guess</button>
+            <div class="controls">
+                <div class="drawing-tools">
+                    <label>Color: <input type="color" id="colorPicker" value="#000"></label>
+                    <label>Size: <input type="range" id="brushSize" min="1" max="20" value="5"></label>
+                    <button id="clearButton">🗑️ Clear Canvas</button>
+                </div>
+                <div class="guessing-section">
+                    <input type="text" id="guessInput" placeholder="Guess the drawing...">
+                    <button id="submitGuess">Submit Guess</button>
+                </div>
+            </div>
             <ul id="playerList"></ul>
-            <h3 id="timer">Time: 30</h3>
         </div>
     </div>
 
